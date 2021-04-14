@@ -1,0 +1,32 @@
+{
+    "name": "allanvb/nova-exports",
+    "description": "Package that allow you to export Laravel Nova resources.",
+    "keywords": [
+        "laravel",
+        "nova",
+        "excel",
+        "exports"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alan Vb",
+            "email": "alan.vb@mail.ru"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.2.0",
+        "laravel/nova": "^3.0",
+        "gobrightspot/nova-detached-actions": "^1.1",
+        "optimistdigital/nova-multiselect-field": "^2.0",
+        "kpolicar/nova-date-range": "dev-master",
+        "rap2hpoutre/fast-excel": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Allanvb\\NovaExports\\": "src/"
+        }
+    }
+}
