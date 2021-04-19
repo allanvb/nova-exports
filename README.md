@@ -38,9 +38,13 @@ public function actions(Request $request): array
 
 - `only([])` - Define whitelist of fields that can be exported.                                                                                            
 - `except([])` - Excludes the given fields from exporting list. 
+- `filename(string $name)` - Sets the download filename. 
 - `withUserSelection()` - Enables multi-select field that allow user to select the fields when exporting.
 - `usesDateRange($columnName)` - Enables date range field that allow user to select the range of dates when exporting. Method accepts a *(string)* column name.
 - `usesGenerator()` - Enables cursor usage when getting data from database. 
+- `queryBuilder(callable $query)` - Manipulate query builder before data exportation. 
+
+*`withUserSelection` method isn't fully supported by `queryBuilder` method. I recommend to not use them together.*
 
 You are also able to use all of [Nova Action](https://nova.laravel.com/docs/3.0/actions/defining-actions.html) methods, and all of [Detached Actions](https://github.com/gobrightspot/nova-detached-actions#display-on-different-screens) methods on `ExportResourceAction`.
 
@@ -59,9 +63,9 @@ The package can throw the following exceptions:
 - [x] Export single resource
 - [x] Implement user selection export
 - [x] Implement generator on exporting
-- [ ] Add option to export to PDF
+- [x] Add way to perform joins on export
 - [ ] Add Eloquent relations export
-- [ ] Add way to perform joins on export
+- [ ] Add option to export to PDF
 
 ## License
 

@@ -2,20 +2,14 @@
 
 namespace Allanvb\NovaExports;
 
-use Allanvb\NovaExports\Exceptions\RangeColumnNotDateException;
 use Allanvb\NovaExports\Exceptions\ColumnNotFoundException;
 use Allanvb\NovaExports\Exceptions\EmptyDataException;
-use App\Nova\Resource as NovaResource;
+use Allanvb\NovaExports\Exceptions\RangeColumnNotDateException;
 use Brightspot\Nova\Tools\DetachedActions\DetachedAction;
 use Generator;
-use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Kpolicar\DateRange\DateRange;
@@ -23,44 +17,14 @@ use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Heading;
 use OptimistDigital\MultiselectField\Multiselect;
 use Rap2hpoutre\FastExcel\Facades\FastExcel;
-use ReflectionClass;
-use ReflectionException;
 use Throwable;
 
-class ExportResourceAction extends DetachedAction
+class ExportResourceAction extends NovaExportAction
 {
-    use InteractsWithQueue;
-    use Queueable;
-
     /**
      * @var string
      */
-    public $confirmButtonText = 'Export';
-
-    /**
-     * @var string
-     */
-    public $confirmText = 'Are you sure you want to perform export action ?';
-
-    /**
-     * @var string
-     */
-    public $icon = 'hero-download';
-
-    /**
-     * @var string
-     */
-    private $resourceName;
-
-    /**
-     * @var Model|null
-     */
-    private $model;
-
-    /**
-     * @var Collection
-     */
-    private $tableColumns;
+    private $rangeColumn = 'created_at';
 
     /**
      * @var Collection
@@ -86,10 +50,6 @@ class ExportResourceAction extends DetachedAction
      * @var bool
      */
     private $usesGenerator = false;
-    /**
-     * @var Builder
-     */
-    private $queryBuilder;
 
     /**
      * @var bool
@@ -97,42 +57,9 @@ class ExportResourceAction extends DetachedAction
     private $usesDateRange = false;
 
     /**
-     * @var string
+     * @var bool
      */
-    private $rangeColumn = 'created_at';
-
-    /**
-     * ExportResourceAction constructor.
-     * @param NovaResource $novaResource
-     * @throws ReflectionException
-     */
-    public function __construct(NovaResource $novaResource)
-    {
-        $this->resourceName = (new ReflectionClass($novaResource))
-            ->getShortName();
-
-        $this->model = $novaResource->resource;
-
-        $this->tableColumns = collect(
-            Schema::getColumnListing(
-                $this->model->getTable()
-            )
-        );
-
-        $this->queryBuilder = DB::table(
-            $this->model->getTable()
-        );
-
-        $this->extraClassesWithDefault('bg-info');
-    }
-
-    /**
-     * @return string
-     */
-    public function label(): string
-    {
-        return 'Export ' . Str::plural($this->resourceName);
-    }
+    private $usesOwnQuery = false;
 
     /**
      * @param ActionFields $fields
@@ -143,17 +70,14 @@ class ExportResourceAction extends DetachedAction
         try {
             $columns = $this->getBuiltColumnList($fields);
 
-            Storage::disk('public')->makeDirectory('exports');
-            $path = Storage::disk('public')->path(
-                $this->generateFileName(true)
-            );
-
             FastExcel::data(
                 $this->getQueryData(
                     $columns,
                     $fields
                 )
-            )->export($path);
+            )->export(
+                $this->generateExportsPath()
+            );
 
             return DetachedAction::download(
                 Storage::disk('public')->url(
@@ -255,7 +179,7 @@ class ExportResourceAction extends DetachedAction
     /**
      * Enables usage of generator when retrieve database data
      *
-     * @return ExportResourceAction
+     * @return $this
      */
     public function usesGenerator(): ExportResourceAction
     {
@@ -282,7 +206,7 @@ class ExportResourceAction extends DetachedAction
 
         if (!$this->tableColumns->contains($this->rangeColumn)) {
             throw new ColumnNotFoundException(
-                'Column ' . $this->rangeColumn . ' does not exists in ' . $this->model->getTable() . ' table'
+                'Column ' . $this->rangeColumn . ' does not exists in ' . $this->table . ' table'
             );
         }
 
@@ -291,6 +215,21 @@ class ExportResourceAction extends DetachedAction
                 'Range column must be explicitly declared as Eloquent date field'
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Add the own query
+     *
+     * @param callable $query
+     * @return $this
+     */
+    public function queryBuilder(callable $query): ExportResourceAction
+    {
+        $this->usesOwnQuery = true;
+
+        $this->queryBuilder = $query($this->queryBuilder);
 
         return $this;
     }
@@ -371,28 +310,15 @@ class ExportResourceAction extends DetachedAction
     }
 
     /**
-     * @param bool $withPath
-     * @return string
-     */
-    protected function generateFileName(bool $withPath = false): string
-    {
-        $fileName = Str::plural($this->resourceName) . '_' . now()->format('m_d_Y') . '.xlsx';
-
-        if ($withPath) {
-            $fileName = 'exports/' . $fileName;
-        }
-
-        return $fileName;
-    }
-
-    /**
      * @param array $columns
      * @param ActionFields $fields
      * @return Generator|array|null
      */
     protected function getQueryData(array $columns, ActionFields $fields)
     {
-        $this->queryBuilder = $this->queryBuilder->select($columns);
+        if (!$this->usesOwnQuery) {
+            $this->queryBuilder = $this->queryBuilder->select($columns);
+        }
 
         if ($this->usesDateRange) {
             $from = $fields->get('from');
@@ -415,8 +341,11 @@ class ExportResourceAction extends DetachedAction
                     );
             }
 
-            $this->queryBuilder = $this->queryBuilder->orderBy($this->rangeColumn);
+            $this->queryBuilder = $this->queryBuilder->orderBy(
+                $this->table . '.' . $this->rangeColumn
+            );
         }
+
 
         if ($this->queryBuilder->count() === 0) {
             throw new EmptyDataException('No records matching selection');
