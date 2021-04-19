@@ -36,8 +36,8 @@ public function actions(Request $request): array
 
 #### Available methods
 
-- `only([])` - Define whitelist of fields that can be exported.                                                                                            
-- `except([])` - Excludes the given fields from exporting list. 
+- `only(array $columns)` - Define whitelist of fields that can be exported.                                                                                            
+- `except(array $columns)` - Excludes the given fields from exporting list. 
 - `filename(string $name)` - Sets the download filename. 
 - `withUserSelection()` - Enables multi-select field that allow user to select the fields when exporting.
 - `usesDateRange($columnName)` - Enables date range field that allow user to select the range of dates when exporting. Method accepts a *(string)* column name.
