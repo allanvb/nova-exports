@@ -21,7 +21,7 @@ This package adds and universal export action to your nova application.
 
 ## Usage
 
-To use the export action, you must add it to `fields` method of your resource. 
+To use the export action, you must add it to `actions` method of your resource. 
 
 ```php
 use Allanvb\NovaExports\ExportResourceAction;
