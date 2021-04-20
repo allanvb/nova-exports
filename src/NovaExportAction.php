@@ -139,13 +139,13 @@ abstract class NovaExportAction extends DetachedAction
     {
         $defaultName = Str::plural($this->resourceName) . '_' . now()->format('m_d_Y');
 
-        $fileName = ($this->fileName ?: $defaultName) . '.xlsx';
+        $name = ($this->fileName ?: $defaultName) . '.xlsx';
 
         if ($withPath) {
-            $fileName = 'exports/' . $fileName;
+            $name = 'exports/' . $name;
         }
 
-        return $fileName;
+        return $name;
     }
 
     /**
