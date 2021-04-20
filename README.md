@@ -6,6 +6,7 @@
     <a href="https://packagist.org/packages/allanvb/nova-exports"><img src="https://img.shields.io/packagist/v/allanvb/nova-exports?color=orange&style=flat-square" alt="Packagist Version"></a>
     <a href="https://packagist.org/packages/allanvb/nova-exports"><img src="https://img.shields.io/github/last-commit/allanvb/nova-exports?color=blue&style=flat-square" alt="GitHub last commit"></a>
     <a href="https://packagist.org/packages/allanvb/nova-exports"><img src="https://img.shields.io/packagist/l/allanvb/nova-exports?color=brightgreen&style=flat-square" alt="License"></a>
+    <a href="https://sonarcloud.io/dashboard/index/allanvb_nova-exports"><img src="https://sonarcloud.io/api/project_badges/measure?project=allanvb_nova-exports&metric=bugs" alt="Sonar"/></a>
 </p>
 
 This package adds and universal export action to your nova application.
