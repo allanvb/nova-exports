@@ -43,9 +43,9 @@ public function actions(Request $request): array
 - `withUserSelection()` - Enables multi-select field that allow user to select the columns when exporting.
 - `usesDateRange(string $columnName)` - Enables field that allow user to select the range of dates when exporting. *Default: `created_at`*
 - `usesGenerator()` - Enables cursor usage when getting data from database. 
-- `queryBuilder(callable $query)` - Manipulate query builder before data exportation. 
+- `queryBuilder(callable $query)` - Use own query on data exportation. 
 
-*`withUserSelection` method isn't fully supported by `queryBuilder` method. I recommend to not use them together.*
+*`withUserSelection` method cannot be used together with `queryBuilder` method.*
 
 You are also able to use all of [Nova Action](https://nova.laravel.com/docs/3.0/actions/defining-actions.html) methods, and all of [Detached Actions](https://github.com/gobrightspot/nova-detached-actions#display-on-different-screens) methods on `ExportResourceAction`.
 

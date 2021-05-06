@@ -2,6 +2,9 @@
 
 All notable changes in Laravel Nova Exports will be documented in this file
 
+## 1.0.2
+- Fixed queryBuilder method bugs
+
 ## 1.0.1
 - Added ability to manipulate with the query builder
 - Added ability to set own file name 

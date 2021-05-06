@@ -317,6 +317,8 @@ class ExportResourceAction extends NovaExportAction
     protected function getQueryData(array $columns, ActionFields $fields)
     {
         if (!$this->usesOwnQuery) {
+            $columns = array_map(fn($column) => $this->table.'.'.$column, $columns);
+
             $this->queryBuilder = $this->queryBuilder->select($columns);
         }
 
@@ -327,7 +329,7 @@ class ExportResourceAction extends NovaExportAction
             if ($from && $to) {
                 $this->queryBuilder = $this->queryBuilder
                     ->whereBetween(
-                        $this->rangeColumn,
+                        $this->table . '.' . $this->rangeColumn,
                         [
                             Carbon::parse($from)->startOfDay(),
                             Carbon::parse($to)->endOfDay()
@@ -336,7 +338,7 @@ class ExportResourceAction extends NovaExportAction
             } elseif ($from && is_null($to)) {
                 $this->queryBuilder = $this->queryBuilder
                     ->whereDate(
-                        $this->rangeColumn,
+                        $this->table . '.' . $this->rangeColumn,
                         Carbon::parse($from)->startOfDay()
                     );
             }
@@ -366,3 +368,4 @@ class ExportResourceAction extends NovaExportAction
         return $data;
     }
 }
+
