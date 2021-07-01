@@ -2,6 +2,9 @@
 
 All notable changes in Laravel Nova Exports will be documented in this file
 
+## 1.1.0
+- Updated rap2hpoutre/fast-excel to v3 and add support for php 8
+
 ## 1.0.2
 - Fixed queryBuilder method bugs
 
