@@ -76,13 +76,15 @@ class ExportResourceAction extends NovaExportAction
                     $fields
                 )
             )->export(
-                $this->generateExportsPath()
+                $this->generateExportPath()
+            );
+
+            $filePath = $this->resolveStorage(
+                $this->generateFileName(true)
             );
 
             return DetachedAction::download(
-                Storage::disk('public')->url(
-                    $this->generateFileName(true)
-                ),
+                $filePath,
                 $this->generateFileName()
             );
         } catch (Throwable $exception) {

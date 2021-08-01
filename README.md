@@ -44,6 +44,7 @@ public function actions(Request $request): array
 - `usesDateRange(string $columnName)` - Enables field that allow user to select the range of dates when exporting. *Default: `created_at`*
 - `usesGenerator()` - Enables cursor usage when getting data from database. 
 - `queryBuilder(callable $query)` - Use own query on data exportation. 
+- `disk(string $disk)` - The storage you want to use for storing export files.
 
 *`withUserSelection` method cannot be used together with `queryBuilder` method.*
 

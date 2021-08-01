@@ -42,6 +42,11 @@ abstract class NovaExportAction extends DetachedAction
     /**
      * @var string
      */
+    public $disk = 'public';
+
+    /**
+     * @var string
+     */
     protected $resourceName;
 
     /**
@@ -71,7 +76,7 @@ abstract class NovaExportAction extends DetachedAction
 
     /**
      * ExportResourceAction constructor.
-     * @param NovaResource $novaResource
+     * @param  NovaResource  $novaResource
      * @throws ReflectionException
      */
     public function __construct(NovaResource $novaResource)
@@ -113,12 +118,23 @@ abstract class NovaExportAction extends DetachedAction
     /**
      * Set the download file name
      *
-     * @param string $name
+     * @param  string  $name
      * @return $this
      */
     public function fileName(string $name): self
     {
         $this->fileName = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param  string  $disk
+     * @return $this
+     */
+    public function disk(string $disk): self
+    {
+        $this->disk = $disk;
 
         return $this;
     }
@@ -132,12 +148,12 @@ abstract class NovaExportAction extends DetachedAction
     }
 
     /**
-     * @param bool $withPath
+     * @param  bool  $withPath
      * @return string
      */
     protected function generateFileName(bool $withPath = false): string
     {
-        $defaultName = Str::plural($this->resourceName) . '_' . now()->format('m_d_Y');
+        $defaultName = Str::plural($this->resourceName) . '_' . now()->format('m_d_Y_H_i');
 
         $name = ($this->fileName ?: $defaultName) . '.xlsx';
 
@@ -153,7 +169,7 @@ abstract class NovaExportAction extends DetachedAction
      *
      * @return string
      */
-    protected function generateExportsPath(): string
+    protected function generateExportPath(): string
     {
         Storage::disk('public')->makeDirectory('exports');
 
@@ -163,20 +179,51 @@ abstract class NovaExportAction extends DetachedAction
     }
 
     /**
-     * @param ActionFields $fields
+     * @param  string  $exportName
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function resolveStorage(string $exportName): string
+    {
+        if ($this->disk === 'public') {
+            return Storage::disk('public')->url(
+                $this->generateFileName(true)
+            );
+        }
+
+        $fileStream = Storage::disk('public')
+            ->get($exportName);
+
+        $diskUpload = Storage::disk($this->disk)
+            ->put(
+                $exportName,
+                $fileStream
+            );
+
+        if ($diskUpload) {
+            Storage::disk('public')
+                ->delete($exportName);
+        }
+
+        return Storage::disk($this->disk)
+            ->url($exportName);
+    }
+
+    /**
+     * @param  ActionFields  $fields
      * @return array
      */
     abstract protected function getBuiltColumnList(ActionFields $fields): array;
 
     /**
-     * @param array $columns
-     * @param ActionFields $fields
+     * @param  array  $columns
+     * @param  ActionFields  $fields
      * @return mixed
      */
     abstract protected function getQueryData(array $columns, ActionFields $fields);
 
     /**
-     * @param ActionFields $fields
+     * @param  ActionFields  $fields
      * @return array
      */
     abstract public function handle(ActionFields $fields): array;
