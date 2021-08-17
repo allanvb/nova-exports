@@ -2,6 +2,9 @@
 
 All notable changes in Laravel Nova Exports will be documented in this file
 
+## 1.1.2
+- Implemented usage of model attributes first
+
 ## 1.1.1
 - Added `disk()` method for external storages.
 

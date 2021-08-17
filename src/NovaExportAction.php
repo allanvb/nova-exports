@@ -88,11 +88,17 @@ abstract class NovaExportAction extends DetachedAction
 
         $this->table = $this->model->getTable();
 
-        $this->tableColumns = collect(
-            Schema::getColumnListing(
-                $this->table
-            )
-        );
+        $modelAttributes = array_keys($novaResource->resource->getAttributes());
+
+        if (!blank($modelAttributes)) {
+            $this->tableColumns = collect($modelAttributes);
+        } else {
+            $this->tableColumns = collect(
+                Schema::getColumnListing(
+                    $this->table
+                )
+            );
+        }
 
         $this->queryBuilder = DB::table(
             $this->table
