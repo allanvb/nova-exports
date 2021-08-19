@@ -52,6 +52,11 @@ abstract class NovaExportAction extends DetachedAction
     /**
      * @var string
      */
+    protected $dbConnection;
+
+    /**
+     * @var string
+     */
     protected $table;
 
     /**
@@ -86,15 +91,23 @@ abstract class NovaExportAction extends DetachedAction
 
         $this->model = $novaResource->resource;
 
+        $this->dbConnection = $this->model->getConnectionName();
+
         $this->table = $this->model->getTable();
 
-        $this->tableColumns = collect(
-            Schema::getColumnListing(
-                $this->table
-            )
-        );
+        $modelAttributes = array_keys($novaResource->resource->getAttributes());
 
-        $this->queryBuilder = DB::table(
+        if (!blank($modelAttributes)) {
+            $this->tableColumns = collect($modelAttributes);
+        } else {
+            $this->tableColumns = collect(
+                Schema::getColumnListing(
+                    $this->table
+                )
+            );
+        }
+
+        $this->queryBuilder = DB::connection($this->dbConnection)->table(
             $this->table
         );
     }
