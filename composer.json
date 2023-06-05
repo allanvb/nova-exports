@@ -21,7 +21,7 @@
         "nesbot/carbon": "^2.31",
         "laravel/nova": "^3.0",
         "gobrightspot/nova-detached-actions": "^1.1",
-        "optimistdigital/nova-multiselect-field": "^2.0",
+        "optimistdigital/nova-multiselect-field": "^2.4.5",
         "kpolicar/nova-date-range": "dev-master",
         "rap2hpoutre/fast-excel": "^3.0"
     },
@@ -29,5 +29,11 @@
         "psr-4": {
             "Allanvb\\NovaExports\\": "src/"
         }
-    }
+    },
+    "repositories": [
+         {
+            "type": "git",
+            "url": "https://github.com/mathieufrh/nova-multiselect-field.git"
+        },   
+    ]
 }
