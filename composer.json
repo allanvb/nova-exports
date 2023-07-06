@@ -19,7 +19,7 @@
     "require": {
         "php": ">=7.2.0|^8.0",
         "nesbot/carbon": "^2.31",
-        "laravel/nova": "^3.0",
+        "laravel/nova": "^4.0",
         "gobrightspot/nova-detached-actions": "^1.1",
         "optimistdigital/nova-multiselect-field": "^2.0",
         "kpolicar/nova-date-range": "dev-master",
